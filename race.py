@@ -5,6 +5,7 @@ import wiringpi
 from random import randint
 from PIL import ImageFont
 
+print('まだ修正中')    # 自分の担当分の修正が完了したら、この行は削除しておいてください。
 
 def main():    #　main担当： 1. □マークを追加する。  2. ギリギリ○マークが勝てるようにする
     disp, image, draw = oled.oled_setup()
