@@ -5,15 +5,13 @@ import wiringpi
 from random import randint
 from PIL import ImageFont
 
-
-
 def main():    #　main担当： 1. □マークを追加する。  2. ギリギリ○マークが勝てるようにする
     disp, image, draw = oled.oled_setup()
     fsize = 15
     n = 3.75    #　この部分が〇の固定値
     ifont = ImageFont.truetype('/usr/share/fonts/oled/Shinonome/Shinonome16.ttf',fsize,encoding='unic')
     
-    members = [entry(0, fsize, '〇'), entry(0, fsize*2, '△')]    #　この部分に各印（xの位置、yの位置、マーク）が格納されている
+    members = [entry(0, fsize, '〇'), entry(0, fsize*2, '△'), entry(0,fsize*3, '□')]    #　この部分に各印（xの位置、yの位置、マーク）が格納されている
     
     while True:
         make(image, draw, ifont, members)
@@ -23,7 +21,8 @@ def main():    #　main担当： 1. □マークを追加する。  2. ギリギ
             else:
                 m.rand(5)
             if m.num >= 100:    #　xの位置が100以上になるとゴール
-                m.goal(draw, ifont)
+                winner=m.mark
+                m.goal(draw, ifont,disp,image,winner)
                 disp.image(image)
                 disp.show()
                 return
@@ -41,14 +40,11 @@ class entry:
         self.num = self.num + randint(1,n)
     def play(self, n):
         self.num = switch(self.num, n)
-    def goal(self, draw, ifont):    # goal担当：どれかがゴールしたときに"(ゴールしたマーク） WIN !!"を表示する画面に遷移させる
-        pass    #　このpassを削除してプログラムを作成する
-  
-
-
-
-
-
+    def goal(self, draw, ifont,disp,image,winner):    # goal担当：どれかがゴールしたときに"(ゴールしたマーク） WIN !!"を表示する画面に遷移させる
+        oled.oled_clear(draw)
+        draw.text((30,15),winner+' '+'WIN !!',font=ifont,fill=255)
+        disp.image(image)
+        disp.show()
 
 fsize = 16
 ifont = ImageFont.truetype('/usr/share/fonts/oled/Shinonome/Shinonome16.ttf', fsize, encoding = 'unic')
@@ -65,7 +61,6 @@ def switch(cir,n):# switch担当：固定値となっている○の移動をSW1
         if(wiringpi.digitalRead(SW1)==0): # 端子の状態を読み込む．ボタンを押すと「0」，放すと「1」
             cir = cir + n
             time.sleep(0.01)
-    
         return cir        
 
 if __name__ == '__main__':
